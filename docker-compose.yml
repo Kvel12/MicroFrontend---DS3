@@ -1,0 +1,75 @@
+version: '3'
+services:
+  container:
+    build: 
+      context: ./container
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - auth
+      - projects
+      - payments
+      - support
+    networks:
+      - mf-network
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./container:/app
+      - /app/node_modules
+
+  auth:
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    networks:
+      - mf-network
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./auth:/app
+      - /app/node_modules
+
+  projects:
+    build:
+      context: ./projects
+      dockerfile: Dockerfile
+    networks:
+      - mf-network
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./projects:/app
+      - /app/node_modules
+
+  payments:
+    build:
+      context: ./payments
+      dockerfile: Dockerfile
+    networks:
+      - mf-network
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./payments:/app
+      - /app/node_modules
+
+  support:
+    build:
+      context: ./support
+      dockerfile: Dockerfile
+    networks:
+      - mf-network
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./support:/app
+      - /app/node_modules
+
+networks:
+  mf-network:
+    driver: bridge
+
+volumes:
+  node_modules:
