@@ -1,0 +1,321 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: microfrontends
+
+---
+# ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: microfrontends
+data:
+  NODE_ENV: "development"
+  PRODUCTION_DOMAIN: "http://10.0.0.10:30080"
+
+---
+# Container App
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: container-app
+  namespace: microfrontends
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: container-app
+  template:
+    metadata:
+      labels:
+        app: container-app
+    spec:
+      containers:
+      - name: container-app
+        image: ghcr.io/kvel12/container-app:latest
+        imagePullPolicy: Always
+        env:
+        - name: PRODUCTION_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              name: frontend-config
+              key: PRODUCTION_DOMAIN
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+
+---
+# Auth App
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-app
+  namespace: microfrontends
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-app
+  template:
+    metadata:
+      labels:
+        app: auth-app
+    spec:
+      containers:
+      - name: auth-app
+        image: ghcr.io/kvel12/auth-app:latest
+        imagePullPolicy: Always
+        env:
+        - name: PRODUCTION_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              name: frontend-config
+              key: PRODUCTION_DOMAIN
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+
+---
+# Projects App
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: projects-app
+  namespace: microfrontends
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: projects-app
+  template:
+    metadata:
+      labels:
+        app: projects-app
+    spec:
+      containers:
+      - name: projects-app
+        image: ghcr.io/kvel12/projects-app:latest
+        imagePullPolicy: Always
+        env:
+        - name: PRODUCTION_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              name: frontend-config
+              key: PRODUCTION_DOMAIN
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+
+---
+# Payments App
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-app
+  namespace: microfrontends
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments-app
+  template:
+    metadata:
+      labels:
+        app: payments-app
+    spec:
+      containers:
+      - name: payments-app
+        image: ghcr.io/kvel12/payments-app:latest
+        imagePullPolicy: Always
+        env:
+        - name: PRODUCTION_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              name: frontend-config
+              key: PRODUCTION_DOMAIN
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+
+---
+# Support App
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: support-app
+  namespace: microfrontends
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: support-app
+  template:
+    metadata:
+      labels:
+        app: support-app
+    spec:
+      containers:
+      - name: support-app
+        image: ghcr.io/kvel12/support-app:latest
+        imagePullPolicy: Always
+        env:
+        - name: PRODUCTION_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              name: frontend-config
+              key: PRODUCTION_DOMAIN
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+
+---
+# Services
+apiVersion: v1
+kind: Service
+metadata:
+  name: container-service
+  namespace: microfrontends
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30080
+  selector:
+    app: container-app
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: microfrontends
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: auth-app
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: projects-service
+  namespace: microfrontends
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: projects-app
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payments-service
+  namespace: microfrontends
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: payments-app
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: support-service
+  namespace: microfrontends
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: support-app
+
+---
+# Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: microfrontend-ingress
+  namespace: microfrontends
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: container-service
+            port:
+              number: 80
+      - path: /auth/(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: auth-service
+            port:
+              number: 80
+      - path: /projects/(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: projects-service
+            port:
+              number: 80
+      - path: /payments/(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: payments-service
+            port:
+              number: 80
+      - path: /support/(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: support-service
+            port:
+              number: 80
