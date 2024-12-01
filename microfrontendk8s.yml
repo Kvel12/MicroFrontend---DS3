@@ -144,7 +144,7 @@ spec:
     spec:
       containers:
       - name: payments-app
-        image: ghcr.io/kvel12/payments-app:latest
+        image: jacklazer/payments-app:v1
         imagePullPolicy: Always
         env:
         - name: PRODUCTION_DOMAIN
