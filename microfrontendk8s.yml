@@ -70,7 +70,7 @@ spec:
     spec:
       containers:
       - name: auth-app
-        image: ghcr.io/kvel12/auth-app:latest
+        image: docker.io/brayanjurado/auth-app:latest
         imagePullPolicy: Always
         env:
         - name: PRODUCTION_DOMAIN
