@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
       - name: container-app
-        image: ghcr.io/kvel12/container-app:latest
+        image: docker.io/yhcarlos14/container
         imagePullPolicy: Always
         env:
         - name: PRODUCTION_DOMAIN
