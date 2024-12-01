@@ -181,7 +181,7 @@ spec:
     spec:
       containers:
       - name: support-app
-        image: ghcr.io/kvel12/support-app:latest
+        image: docker.io/josemp0507/support-app:latest
         imagePullPolicy: Always
         env:
         - name: PRODUCTION_DOMAIN
